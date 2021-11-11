@@ -1,12 +1,14 @@
 package main
 
 import (
+	"github.com/emersion/go-smtp"
+	"github.com/roambin/litemail/web"
 	"io"
 	"io/ioutil"
 	"log"
+	"os"
+	"strconv"
 	"time"
-
-	"github.com/emersion/go-smtp"
 )
 
 // The Backend implements SMTP server methods.
@@ -23,7 +25,9 @@ func (bkd *Backend) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, e
 }
 
 // A Session is returned after EHLO.
-type Session struct{}
+type Session struct{
+	toAddr string
+}
 
 func (s *Session) Mail(from string, opts smtp.MailOptions) error {
 	log.Println("Mail from:", from)
@@ -32,6 +36,7 @@ func (s *Session) Mail(from string, opts smtp.MailOptions) error {
 
 func (s *Session) Rcpt(to string) error {
 	log.Println("Rcpt to:", to)
+	s.toAddr = to
 	return nil
 }
 
@@ -41,6 +46,7 @@ func (s *Session) Data(r io.Reader) error {
 		return err
 	} else {
 		log.Println("Data:", string(b))
+		web.DealMail(s.toAddr, string(b))
 	}
 	return nil
 }
@@ -55,6 +61,18 @@ func (s *Session) Logout() error {
 }
 
 func main() {
+	if len(os.Args) == 4 && os.Args[1] == "post" {
+		n, _ := strconv.Atoi(os.Args[3])
+		for i := 1; i <= n; i++ {
+			time.Sleep(time.Second)
+			web.PostMail(os.Args[2], i)
+		}
+	} else {
+		start()
+	}
+}
+
+func start() {
 	be := &Backend{}
 
 	s := smtp.NewServer(be)

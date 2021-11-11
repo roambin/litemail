@@ -19,7 +19,7 @@ func main() {
 		"Subject: discount Gophers!\r\n" +
 		"\r\n" +
 		"This is the email body.\r\n")
-	err := smtp.SendMail("localhost:25", auth, "sender@example.org", to, msg)
+	err := smtp.SendMail("litemail.top:25", auth, "sender@example.org", to, msg)
 	if err != nil {
 		log.Fatal(err)
 	}
