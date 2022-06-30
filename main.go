@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/emersion/go-smtp"
 	"github.com/roambin/litemail/web"
 	"io"
@@ -65,10 +66,11 @@ func main() {
 		n, _ := strconv.Atoi(os.Args[3])
 		for i := 1; i <= n; i++ {
 			time.Sleep(time.Second)
+			fmt.Println(os.Args[2], i)
 			web.PostMail(os.Args[2], i)
 		}
 	} else {
-		start()
+		//start()
 	}
 }
 
@@ -77,7 +79,7 @@ func start() {
 
 	s := smtp.NewServer(be)
 
-	s.Addr = ":25"
+	s.Addr = ":10001"
 	s.Domain = "localhost"
 	s.ReadTimeout = 10 * time.Second
 	s.WriteTimeout = 10 * time.Second
